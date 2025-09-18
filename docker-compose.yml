@@ -1,0 +1,35 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  k8s-nlq-system:
+    build: .
+    container_name: k8s-nlq-system
+    ports:
+      - "8501:8501"
+    environment:
+      # AWS Credentials (use IAM roles in production)
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      # Streamlit configuration
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      # Mount kubeconfig from host
+      - ~/.kube:/home/appuser/.kube:ro
+      # Optional: Mount AWS credentials (alternative to environment variables)
+      # - ~/.aws:/home/appuser/.aws:ro
+    restart: unless-stopped
+    networks:
+      - k8s-nlq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  k8s-nlq-network:
+    driver: bridge

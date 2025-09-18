@@ -1,0 +1,12 @@
+# requirements.txt - Fixed all dependency conflicts
+streamlit
+langgraph
+langchain
+langchain-aws
+langchain-community
+langchain-core
+kubernetes
+boto3
+pandas
+python-dotenv
+requests
